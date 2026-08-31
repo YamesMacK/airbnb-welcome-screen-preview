@@ -1,11 +1,11 @@
 {
-  "_comment": "SAFE TRACKED FALLBACK. Keep guest names/dates, Wi-Fi credentials, street address, and host contact details in same-origin device storage via ?setup, never in this file.",
+  "_comment": "PUBLIC REVIEW PREVIEW. Guest, Wi-Fi, location, and host values below are fictional review data and are not used by the live property device.",
 
   "guest": {
-    "_comment": "Public fallback stays generic. Device-only values are entered through ?setup.",
-    "name": "",
-    "checkIn": "",
-    "checkOut": ""
+    "_comment": "Fictional stay used to exercise the complete public review experience.",
+    "name": "Carter Family",
+    "checkIn": "2026-09-04",
+    "checkOut": "2026-09-07"
   },
 
   "property": {
@@ -39,8 +39,8 @@
   },
 
   "wifi": {
-    "ssid": "",
-    "password": "",
+    "ssid": "Shoreline Guest Review",
+    "password": "ReviewOnly2026",
     "encryption": "WPA"
   },
 
@@ -143,11 +143,11 @@
   ],
 
   "safety": {
-    "address": "",
+    "address": "Lake Conroe, Montgomery, TX 77356",
     "emergencyNumber": "911",
     "hospital": "HCA Houston Healthcare Conroe, 504 Medical Center Blvd, Conroe (ER, about 25 min)",
-    "hostName": "",
-    "hostPhone": "",
+    "hostName": "Shoreline Host Team",
+    "hostPhone": "(936) 555-0126",
     "extinguisher": "Under the kitchen sink (please confirm)",
     "breaker": "In the garage (please confirm)",
     "shutoff": "Water and gas shutoffs in the garage / exterior (please confirm)"
