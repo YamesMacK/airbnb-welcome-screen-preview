@@ -312,6 +312,12 @@
     box-shadow:0 10px 28px rgba(40,15,145,.2);
   }
   #systemStatus[hidden]{display:none}
+  #previewBadge{
+    position:fixed;z-index:20;left:50%;bottom:max(6px,.8vmin);transform:translateX(-50%);
+    width:max-content;max-width:92vw;margin:0;padding:.2em .8em;border-radius:999px;
+    pointer-events:none;text-align:center;color:var(--ink);background:var(--ground);opacity:.8;
+    font-family:var(--sans);font-size:clamp(11px,1.2vmin,24px);letter-spacing:.12em;text-transform:uppercase;
+  }
 
   /* Device setup is deliberately same-origin and writes only to this browser's
      local storage. It is not part of the guest-facing kiosk navigation. */
@@ -444,6 +450,7 @@
 
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <div id="systemStatus" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+<p id="previewBadge">Public preview &middot; fictional stay &middot; apps open only on the TV</p>
 
 <main class="setup" id="setup" hidden aria-labelledby="setupTitle">
   <div class="setup-card">
@@ -489,7 +496,6 @@
 </main>
 
 <script src="assets/qrcode.min.js"></script>
-<script src="assets/apply-stay.js?v=5"></script>
 <script>
 (function(){
   "use strict";
@@ -503,9 +509,11 @@
   var statusMessages={};
   var configSeq=0;
   var configRetryT=null;
-  var DEVICE_CONFIG_KEY='ssh-device-config-v1';
+  /* Public preview: shares the github.io origin with the live site, so it never
+     reads or writes the live device key and has no ?setup screen. */
+  var DEVICE_CONFIG_KEY='ssh-preview-device-config-v1';
   var SHARED_CONFIG_KEY='ssh-shared-config-v1:'+new URL('.',location.href).pathname;
-  var setupMode=new URLSearchParams(location.search).has('setup');
+  var setupMode=false;
   var idleFocus=null;
   /* Fully repeats a wake every week, so re-check it whenever this page runs:
      on load, when the screen comes back, and each minute while it is showing. */
@@ -1029,11 +1037,6 @@
     setInterval(function(){if(cfg&&!refreshExpiredGuest())loadWeather(cfg.location);},60*60*1000);
     wireModal();
     window.addEventListener('online',loadConfiguration);
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(function(){
-        setSystemStatus('offline','Offline startup is not available in this browser. Keep the internet connected.');
-      });
-    }
     if(setupMode)initSetup();
     else{
       /* Reached by the remote's Back key walking into an older WebView entry (a ?panel=
@@ -1290,26 +1293,26 @@
     };
   }
 
-  function readDeviceConfig(){
-    try{
-      var stored=localStorage.getItem(DEVICE_CONFIG_KEY);
-      if(stored==null)return {config:null,error:''};
-      var parsed=JSON.parse(stored);
-      var subset=deviceSubset(parsed);
-      if(!subset)return {config:null,error:'Device-only details were malformed and were safely ignored.'};
-      return {config:subset,error:''};
-    }catch(e){
-      return {config:null,error:'Device-only details could not be read from this browser. Showing the public fallback.'};
-    }
+  /* Fictional review stay. Dates roll with today so the greeting always shows.
+     The Wi-Fi network and password are fake; the address is city-level only. */
+  function previewDate(offsetDays){
+    var d=new Date();d.setDate(d.getDate()+offsetDays);
+    return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+  }
+  function previewStay(){
+    return {
+      guest:{name:'Carter Family',checkIn:previewDate(-1),checkOut:previewDate(2)},
+      wifi:{ssid:'Shoreline Guest Review',password:'ReviewOnly2026',encryption:'WPA'},
+      safety:{address:'Lake Conroe, Montgomery, TX 77356',hostName:'',hostPhone:''}
+    };
   }
 
-  function writeDeviceConfig(value){
-    try{
-      localStorage.setItem(DEVICE_CONFIG_KEY,JSON.stringify(deviceSubset(value)));
-      return '';
-    }catch(e){
-      return 'This browser blocked local storage, so no private details were saved.';
-    }
+  function readDeviceConfig(){
+    return {config:deviceSubset(previewStay()),error:''};
+  }
+
+  function writeDeviceConfig(){
+    return '';
   }
 
   function applyConfig(c,issues,guestNotice){
@@ -2103,7 +2106,7 @@
     var intentUrl=cleanLaunchValue(app.intentUrl,4096);
     var f=window.fully;
     if(!f){
-      toast('TV app launching is available on the configured Shield.');
+      toast('Preview only. On the TV this button opens '+label+'.');
       return 'desktop';
     }
     var attempted=false;

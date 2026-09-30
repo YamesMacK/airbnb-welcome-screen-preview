@@ -1,8 +1,8 @@
 {
-  "_comment": "SAFE TRACKED FALLBACK. Keep guest names/dates, Wi-Fi credentials, street address, and host contact details in same-origin device storage via ?setup, never in this file.",
+  "_comment": "PUBLIC REVIEW PREVIEW. Shared guide content mirrors the live site. The page ignores guest, Wi-Fi, address, and host fields here; its fictional review stay lives in previewStay() in index.html.",
 
   "guest": {
-    "_comment": "Public fallback stays generic. Device-only values are entered through ?setup.",
+    "_comment": "Left blank. The preview shows the fictional Carter Family stay from index.html.",
     "name": "",
     "checkIn": "",
     "checkOut": ""
